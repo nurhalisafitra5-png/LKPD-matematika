@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan & Eksplorasi Geometri Lingkaran: Sudut Pusat & Sudut Keliling (Fase F SMA)</title>
+  
+  <!-- CDN Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#1e1b4b',
+            }
+          },
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- KaTeX CDN untuk Render Notasi & Simbol Matematika LaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .step-active { border-color: #4f46e5; background-color: #eef2ff; color: #4338ca; }
+    .step-completed { border-color: #10b981; background-color: #ecfdf5; color: #065f46; }
+    .step-inactive { border-color: #cbd5e1; background-color: #ffffff; color: #64748b; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* CSS Khusus Format Cetak Dokumen PDF / Print */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 11pt !important;
+      }
+      header, footer, nav, button, .no-print {
+        display: none !important;
+      }
+      #stepSection-1, #stepSection-2, #stepSection-3, #stepSection-4, #stepSection-5, #stepSection-6 {
+        display: none !important;
+      }
+      #printablePdfReport {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+  <!-- ==================== WEB APP HEADER ==================== -->
+  <header class="bg-gradient-to-r from-slate-900 via-brand-900 to-indigo-950 text-white shadow-xl sticky top-0 z-50 border-b border-indigo-800/40 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/30 ring-2 ring-white/20">
+          <i class="fa-solid fa-compass-drafting text-xl text-white"></i>
+        </div>
+        <div>
+          <span class="inline-block text-[10px] tracking-wider uppercase font-extrabold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full mb-0.5">
+            Matematika Fase F • Kelas XI SMA
+          </span>
+          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            Laboratorium Geometri Lingkaran
+          </h1>
+        </div>
+      </div>
+      
+      <!-- Group Status Pill -->
+      <div id="headerGroupBadge" class="hidden sm:flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/15 text-xs text-indigo-100 shadow-inner">
+        <i class="fa-solid fa-users text-emerald-400"></i>
+        <span class="font-medium text-slate-300">Kelompok:</span>
+        <span id="badgeGroupName" class="font-bold text-white uppercase tracking-wider">Belum Ada</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+      </div>
+    </div>
+
+    <!-- STEP PROGRESS BAR NAVIGATION -->
+    <div class="bg-slate-900/95 backdrop-blur border-t border-white/10 px-4 py-2.5">
+      <div class="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto gap-2 no-scrollbar py-1">
+        
+        <button onclick="goToStep(1)" id="stepTab-1" class="step-active flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-brand-600 text-white flex items-center justify-center text-[11px] font-bold">1</span>
+          <span>Registrasi Tim</span>
+        </button>
+
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+        <button onclick="goToStep(2)" id="stepTab-2" class="step-inactive flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[11px] font-bold">2</span>
+          <span>Studi Kasus Radar</span>
+        </button>
+
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+        <button onclick="goToStep(3)" id="stepTab-3" class="step-inactive flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[11px] font-bold">3</span>
+          <span>Investigasi Fisik</span>
+        </button>
+
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+        <button onclick="goToStep(4)" id="stepTab-4" class="step-inactive flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[11px] font-bold">4</span>
+          <span>Foto & Verifikasi</span>
+        </button>
+
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+        <button onclick="goToStep(5)" id="stepTab-5" class="step-inactive flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[11px] font-bold">5</span>
+          <span>Kanvas Dinamis</span>
+        </button>
+
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-500"></i>
+
+        <button onclick="goToStep(6)" id="stepTab-6" class="step-inactive flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold whitespace-nowrap transition-all shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-[11px] font-bold">6</span>
+          <span>Evaluasi & Cetak PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN SCREEN CONTAINER ==================== -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ==================== LANGKAH 1: REGISTRASI TIM ==================== -->
+    <section id="stepSection-1" class="space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-slate-100 gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-md">
+              Tahap 1: Kolaborasi Kelompok
+            </span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-2">Daftarkan Tim & Distribusi Peran</h2>
+            <p class="text-sm text-slate-500 mt-1">
+              Atur keanggotaan kelompok (1-6 anggota) dengan peran terarah untuk menyelesaikan penyelidikan matematika.
+            </p>
+          </div>
+          <div class="px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center gap-3">
+            <i class="fa-solid fa-user-group text-2xl text-brand-600"></i>
+            <div>
+              <p class="text-[11px] font-medium text-slate-500 uppercase">Jumlah Anggota</p>
+              <p id="memberCountText" class="text-lg font-bold text-brand-700">2 / 6 Anggota</p>
+            </div>
+          </div>
+        </div>
+
+        <form id="groupForm" onsubmit="handleGroupSubmit(event)" class="mt-6 space-y-6">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-1">
+              Nama Kelompok / Tim Peneliti <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-shield-halved"></i>
+              </span>
+              <input type="text" id="groupNameInput" required placeholder="Contoh: Tim Archimedes - SMAN 1"
+                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 text-sm font-medium transition" />
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <label class="block text-sm font-semibold text-slate-700">
+                Daftar Anggota & Spesialisasi Peran
+              </label>
+              <button type="button" onclick="addMemberField()" id="btnAddMember"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-3 py-1.5 rounded-lg border border-brand-200 transition">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Tambah Anggota</span>
+              </button>
+            </div>
+
+            <div id="membersContainer" class="space-y-3">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button type="submit" class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg shadow-brand-600/30 transition transform hover:-translate-y-0.5">
+              <span>Lanjut ke Studi Kasus</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ==================== LANGKAH 2: STUDI KASUS KONTEKSTUAL ==================== -->
+    <section id="stepSection-2" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="pb-6 border-b border-slate-100">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md">
+            Tahap 2: Konteks Rekayasa & Navigasi
+          </span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+            Studi Kasus: Sistem Radar Pemantauan Maritim Selat Berbahaya
+          </h2>
+          <p class="text-sm text-slate-600 mt-1">
+            Menganalisis sudut pandang navigasi kapal patroli dan stasiun radar sentral dalam sistem koordinat melingkar.
+          </p>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4 text-sm leading-relaxed text-slate-600">
+            <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+              <h3 class="font-bold text-slate-800 text-base mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-satellite-dish text-brand-600"></i>
+                Skenario Navigasi Selat Karang
+              </h3>
+              <p>
+                Sebuah mercusuar radar didirikan pada stasiun pusat lingkaran (titik O). Zona karang berbahaya ditandai oleh dua pelampung sonar di titik A dan B pada keliling lingkaran perairan.
+              </p>
+              <p class="mt-2">
+                Menara radar di pusat O memancarkan sapuan sudut sektor sebesar <strong class="text-brand-700 font-semibold">Sudut Pusat $\angle AOB$</strong> untuk memindai bentangan karang garis AB.
+              </p>
+            </div>
+
+            <div class="p-4 bg-amber-50/80 border border-amber-200 rounded-xl">
+              <h4 class="font-bold text-amber-900 text-sm flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-triangle-exclamation text-amber-600"></i>
+                Pertanyaan Investigasi Geometris:
+              </h4>
+              <p class="text-amber-900 text-xs sm:text-sm">
+                Kapal patroli berada di garis keliling perairan luar (titik C). Petugas navigasi kapal mengamati kedua pelampung A dan B dengan teropong optik, yang membentuk <strong class="text-emerald-700 font-semibold">Sudut Keliling $\angle ACB$</strong>. Mengapa besar sudut pandang optik kapal selalu bernilai tepat setengah dari sudut pancaran pemancar radar pusat ($\angle ACB = \frac{1}{2} \angle AOB$)?
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 rounded-lg bg-indigo-50/60 border border-indigo-100 flex items-start gap-2.5">
+                <i class="fa-solid fa-circle-dot text-brand-600 mt-0.5"></i>
+                <div>
+                  <span class="font-bold text-slate-800 block">Stasiun Radar (Titik O)</span>
+                  <span class="text-slate-500">Membentuk Sudut Pusat ($\angle AOB$)</span>
+                </div>
+              </div>
+              <div class="p-3 rounded-lg bg-emerald-50/60 border border-emerald-100 flex items-start gap-2.5">
+                <i class="fa-solid fa-ship text-emerald-600 mt-0.5"></i>
+                <div>
+                  <span class="font-bold text-slate-800 block">Kapal Penyelidik (Titik C)</span>
+                  <span class="text-slate-500">Membentuk Sudut Keliling ($\angle ACB$)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SVG Precision Graphic -->
+          <div class="lg:col-span-5 flex flex-col items-center justify-center p-4 bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-3 left-3 flex items-center gap-2 text-[11px] text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Diagram Teknis Radar Maritim
+            </div>
+
+            <svg viewBox="0 0 400 380" class="w-full max-w-[340px] h-auto my-2">
+              <defs>
+                <pattern id="radarGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#1e293b" stroke-width="0.8" />
+                </pattern>
+                <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#4f46e5" stop-opacity="0.0" />
+                </radialGradient>
+              </defs>
+
+              <rect width="400" height="380" fill="#0b1120" />
+              <rect width="400" height="380" fill="url(#radarGrid)" />
+
+              <!-- Outer Circle -->
+              <circle cx="200" cy="200" r="140" fill="url(#radarGlow)" stroke="#334155" stroke-width="2" stroke-dasharray="4 4" />
+              <circle cx="200" cy="200" r="140" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.6" />
+              
+              <!-- Arc AB -->
+              <path d="M 95 105 A 140 140 0 0 0 305 105" fill="none" stroke="#f43f5e" stroke-width="5" stroke-linecap="round" />
+
+              <!-- Sector AOB -->
+              <path d="M 200 200 L 95 105 A 140 140 0 0 0 305 105 Z" fill="#6366f1" fill-opacity="0.18" />
+
+              <!-- Lines OA, OB (Dua Jari-Jari) -->
+              <line x1="200" y1="200" x2="95" y2="105" stroke="#818cf8" stroke-width="2.5" />
+              <line x1="200" y1="200" x2="305" y2="105" stroke="#818cf8" stroke-width="2.5" />
+
+              <!-- Lines CA, CB (Dua Tali Busur) -->
+              <line x1="200" y1="340" x2="95" y2="105" stroke="#10b981" stroke-width="2.5" stroke-dasharray="3 3" />
+              <line x1="200" y1="340" x2="305" y2="105" stroke="#10b981" stroke-width="2.5" stroke-dasharray="3 3" />
+
+              <!-- Points & Text -->
+              <circle cx="200" cy="200" r="5" fill="#f59e0b" stroke="#ffffff" stroke-width="2" />
+              <text x="200" y="222" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">O (Pusat)</text>
+
+              <circle cx="95" cy="105" r="6" fill="#f43f5e" stroke="#ffffff" stroke-width="2" />
+              <text x="75" y="98" fill="#f43f5e" font-size="12" font-weight="bold">A</text>
+
+              <circle cx="305" cy="105" r="6" fill="#f43f5e" stroke="#ffffff" stroke-width="2" />
+              <text x="315" y="98" fill="#f43f5e" font-size="12" font-weight="bold">B</text>
+
+              <circle cx="200" cy="340" r="7" fill="#10b981" stroke="#ffffff" stroke-width="2" />
+              <text x="200" y="365" fill="#10b981" font-size="12" font-weight="bold" text-anchor="middle">C (Kapal)</text>
+
+              <text x="200" y="175" fill="#fbbf24" font-size="12" font-weight="bold" text-anchor="middle">∠AOB = 2θ</text>
+              <text x="200" y="325" fill="#34d399" font-size="12" font-weight="bold" text-anchor="middle">∠ACB = θ</text>
+            </svg>
+            <p class="text-[11px] text-slate-400 text-center mt-2 px-2">
+              Kedua sudut menghadap busur lingkaran AB yang sama persis.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between">
+          <button onclick="goToStep(1)" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50 transition">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali
+          </button>
+          <button onclick="goToStep(3)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 font-semibold text-white shadow-lg shadow-brand-600/30 transition">
+            Lanjut ke Investigasi Fisik <i class="fa-solid fa-arrow-right ml-1.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LANGKAH 3: PETUNJUK INVESTIGASI FISIK ==================== -->
+    <section id="stepSection-3" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="pb-6 border-b border-slate-100">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md">
+            Tahap 3: Konstruksi Jangka & Busur Fisik
+          </span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+            Protokol Melukis Geometri Presisi di Kertas
+          </h2>
+          <p class="text-sm text-slate-600 mt-1">
+            Buktikan kebenaran hubungan matematis ini secara empiris di atas kertas menggunakan jangka dan busur derajat.
+          </p>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-clipboard-user text-brand-600"></i>
+            Kartu Tugas Khusus Anggota Kelompok Anda:
+          </h3>
+          <div id="roleCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Drawing Instructions -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative flex flex-col justify-between">
+            <div>
+              <div class="w-8 h-8 rounded-lg bg-brand-600 text-white font-bold flex items-center justify-center text-sm mb-3">1</div>
+              <h4 class="font-bold text-slate-800 text-base mb-2">Lukis Sudut Pusat</h4>
+              <p class="text-xs text-slate-600 leading-relaxed mb-2">
+                Tentukan titik pusat O, buat lingkaran berjarak radius tetap (r ≈ 7 cm). Pilih titik A dan B pada keliling. Tarik <strong>dua jari-jari</strong> OA dan OB. Ukur besar $\angle AOB$ dengan busur derajat.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] text-brand-700 font-semibold">
+              Variabel: Sudut Pusat ($\angle AOB$)
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative flex flex-col justify-between">
+            <div>
+              <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center text-sm mb-3">2</div>
+              <h4 class="font-bold text-slate-800 text-base mb-2">Uji Sudut Keliling C & D</h4>
+              <p class="text-xs text-slate-600 leading-relaxed mb-2">
+                Pilih titik C pada busur mayor. Hubungkan <strong>dua tali busur</strong> CA dan CB (kaki sudut keliling), lalu ukur $\angle ACB$. Selanjutnya pilih titik lain D, hubungkan dua tali busur DA dan DB, lalu ukur $\angle ADB$.
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] text-emerald-700 font-semibold">
+              Uji Sifat: $\angle ACB = \angle ADB$
+            </div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 relative flex flex-col justify-between">
+            <div>
+              <div class="w-8 h-8 rounded-lg bg-amber-600 text-white font-bold flex items-center justify-center text-sm mb-3">3</div>
+              <h4 class="font-bold text-slate-800 text-base mb-2">Kasus Khusus Diameter</h4>
+              <p class="text-xs text-slate-600 leading-relaxed mb-2">
+                Tarik garis lurus melewati titik pusat O untuk membentuk diameter XY (Sudut pusat = $180^\circ$). Pilih sembarang titik P pada keliling, tarik dua tali busur PX dan PY, ukur besar $\angle XPY$. Amati apakah selalu siku-siku ($90^\circ$).
+              </p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-200 text-[11px] text-amber-700 font-semibold">
+              Teorema Thales: $\angle XPY = 90^\circ$
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between">
+          <button onclick="goToStep(2)" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50 transition">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali
+          </button>
+          <button onclick="goToStep(4)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 font-semibold text-white shadow-lg shadow-brand-600/30 transition">
+            Ambil Foto & Verifikasi Data <i class="fa-solid fa-arrow-right ml-1.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LANGKAH 4: FOTO & VERIFIKASI ANALITIS ==================== -->
+    <section id="stepSection-4" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="pb-6 border-b border-slate-100">
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2.5 py-1 rounded-md">
+            Tahap 4: Dokumentasi & Verifikasi Analitis
+          </span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+            Pindai Bukti Gambar Fisik & Validasi Matematis
+          </h2>
+          <p class="text-sm text-slate-600 mt-1">
+            Gunakan kamera HP/laptop untuk memfoto gambar kertas kerja kelompok Anda, atau unggah foto dari galeri perangkat.
+          </p>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div class="lg:col-span-6 space-y-4">
+            <div class="bg-slate-900 rounded-2xl p-4 text-white flex flex-col items-center justify-center min-h-[320px] relative overflow-hidden border border-slate-800">
+              <video id="webcamFeed" autoplay playsinline class="hidden w-full h-[280px] object-cover rounded-xl border border-slate-700"></video>
+              <img id="capturedImagePreview" src="" alt="Hasil Foto Lukisan Siswa" class="hidden w-full h-[280px] object-contain rounded-xl bg-black/40" />
+
+              <div id="cameraPlaceholder" class="text-center p-6 space-y-3">
+                <div class="w-16 h-16 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-slate-400 text-2xl">
+                  <i class="fa-solid fa-camera"></i>
+                </div>
+                <div>
+                  <h4 class="font-semibold text-slate-200 text-sm">Kamera Belum Aktif</h4>
+                  <p class="text-xs text-slate-400 mt-0.5">Buka kamera atau unggah berkas foto kertas hasil kerja kelompok Anda.</p>
+                </div>
+              </div>
+              <canvas id="snapshotCanvas" class="hidden"></canvas>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" id="btnStartCamera" onclick="startCamera()" class="flex-1 inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition">
+                <i class="fa-solid fa-video"></i> Aktifkan Kamera
+              </button>
+              <button type="button" id="btnCapturePhoto" onclick="captureSnapshot()" disabled class="disabled:opacity-50 flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition">
+                <i class="fa-solid fa-camera-retro"></i> Ambil Foto
+              </button>
+              <label class="flex-1 inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 px-4 rounded-xl border border-slate-300 cursor-pointer transition">
+                <i class="fa-solid fa-upload"></i> Unggah Gambar
+                <input type="file" id="fileUploadInput" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+              </label>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 space-y-5 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-brand-600"></i>
+              Data Numerik Pengukuran Busur Derajat
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  Sudut Pusat Terukur ($\angle AOB$)
+                </label>
+                <div class="relative">
+                  <input type="number" id="inputCenterAngle" min="1" max="359" step="0.5" placeholder="Contoh: 100"
+                    class="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-800 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20" />
+                  <span class="absolute right-3 top-2.5 text-sm font-bold text-slate-400">°</span>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">
+                  Sudut Keliling Terukur ($\angle ACB$)
+                </label>
+                <div class="relative">
+                  <input type="number" id="inputInscribedAngle" min="1" max="179" step="0.5" placeholder="Contoh: 50"
+                    class="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-800 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20" />
+                  <span class="absolute right-3 top-2.5 text-sm font-bold text-slate-400">°</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">
+                Sudut Keliling Kedua ($\angle ADB$) — Opsional untuk Uji Sifat Turunan
+              </label>
+              <div class="relative">
+                <input type="number" id="inputInscribedAngle2" min="1" max="179" step="0.5" placeholder="Contoh: 50"
+                  class="w-full pl-3 pr-8 py-2.5 rounded-xl border border-slate-300 font-medium text-slate-800 text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20" />
+                <span class="absolute right-3 top-2.5 text-sm font-bold text-slate-400">°</span>
+              </div>
+            </div>
+
+            <button type="button" onclick="verifyPhysicalMeasurement()"
+              class="w-full inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md shadow-emerald-600/30 transition">
+              <i class="fa-solid fa-square-root-variable"></i>
+              Jalankan Analisis Verifikasi Teorema
+            </button>
+
+            <div id="verificationResultBox" class="hidden p-4 rounded-xl text-xs sm:text-sm border transition-all"></div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between">
+          <button onclick="goToStep(3)" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50 transition">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali
+          </button>
+          <button onclick="goToStep(5)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 font-semibold text-white shadow-lg shadow-brand-600/30 transition">
+            Lanjut ke Kanvas Dinamis Interaktif <i class="fa-solid fa-arrow-right ml-1.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LANGKAH 5: DYNAMIC GEOMETRY CANVAS ==================== -->
+    <section id="stepSection-5" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="pb-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+              Tahap 5: Simulasi Digital Lanjut (Guided Discovery)
+            </span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+              Kanvas Interaktif Geometri Lingkaran
+            </h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Geser titik A, B, C₁, atau C₂ pada lingkaran untuk membuktikan sifat secara real-time.
+            </p>
+          </div>
+
+          <!-- Feature Toggles -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="toggleSecondAngleBtn" onclick="toggleSecondInscribedAngle()"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 transition flex items-center gap-2">
+              <i class="fa-solid fa-circle-nodes text-brand-600"></i>
+              <span>+ Sudut Keliling Ke-2 (C₂)</span>
+            </button>
+            <button id="toggleDiameterBtn" onclick="toggleDiameterMode()"
+              class="px-3.5 py-2 rounded-xl text-xs font-bold border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 transition flex items-center gap-2">
+              <i class="fa-solid fa-arrows-split-up-and-left text-amber-600"></i>
+              <span>Mode Diameter ($90^\circ$ Thales)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Canvas Area -->
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 flex flex-col items-center bg-slate-950 p-3 sm:p-4 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
+            
+            <!-- Toolbar & Reset -->
+            <div class="w-full flex justify-between items-center text-xs text-slate-400 pb-2 px-2 border-b border-slate-800">
+              <span class="flex items-center gap-1.5 text-emerald-400 font-medium">
+                <i class="fa-solid fa-hand-pointer text-xs"></i> Klik & Seret Titik A, B, C₁, atau C₂
+              </span>
+              <button onclick="resetCanvasPoints()" class="text-slate-400 hover:text-white transition flex items-center gap-1">
+                <i class="fa-solid fa-rotate-left"></i> Reset Posisi
+              </button>
+            </div>
+
+            <!-- Canvas Element -->
+            <canvas id="geomCanvas" width="600" height="460" class="w-full max-w-[600px] h-auto touch-none cursor-crosshair rounded-xl my-2"></canvas>
+            
+            <!-- Keterangan Gambar Lengkap & Jelas pada Kanvas Dinamis -->
+            <div class="w-full bg-slate-900/95 rounded-xl p-3 border border-slate-800 text-xs space-y-2 text-slate-200">
+              <div class="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+                <i class="fa-solid fa-circle-info text-brand-400"></i>
+                <span class="font-bold text-slate-100 uppercase tracking-wider text-[11px]">Keterangan Geometri Visual Kanvas:</span>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-[11.5px] leading-relaxed">
+                <!-- Keterangan Garis Biru -->
+                <div class="flex items-start gap-2 bg-slate-950/60 p-2 rounded-lg border border-indigo-900/40">
+                  <span class="w-3.5 h-3.5 rounded bg-indigo-500 flex-shrink-0 mt-0.5"></span>
+                  <div>
+                    <span class="font-bold text-indigo-300">Garis berwarna biru (garis OA dan garis OB):</span>
+                    <span class="text-slate-300 block">Adalah <strong>dua jari-jari</strong> yang berpusat di O dan membentuk <strong>Sudut Pusat ($\angle AOB$)</strong>.</span>
+                  </div>
+                </div>
+
+                <!-- Keterangan Garis Hijau -->
+                <div class="flex items-start gap-2 bg-slate-950/60 p-2 rounded-lg border border-emerald-900/40">
+                  <span class="w-3.5 h-3.5 rounded bg-emerald-500 flex-shrink-0 mt-0.5"></span>
+                  <div>
+                    <span class="font-bold text-emerald-300">Garis berwarna hijau (garis AC dan garis BC):</span>
+                    <span class="text-slate-300 block">Adalah <strong>dua tali busur</strong> yang berpotongan di keliling titik C dan membentuk <strong>Sudut Keliling ($\angle ACB$)</strong>.</span>
+                  </div>
+                </div>
+
+                <!-- Keterangan Garis Kuning Emas / Amber -->
+                <div class="flex items-start gap-2 bg-slate-950/60 p-2 rounded-lg border border-amber-900/40">
+                  <span class="w-3.5 h-3.5 rounded bg-amber-500 flex-shrink-0 mt-0.5 border border-dashed border-amber-200"></span>
+                  <div>
+                    <span class="font-bold text-amber-300">Garis berwarna kuning/amber (garis AB):</span>
+                    <span class="text-slate-300 block">Adalah <strong>garis tali busur AB</strong> yang menghubungkan ujung kedua busur.</span>
+                  </div>
+                </div>
+
+                <!-- Keterangan Busur Merah -->
+                <div class="flex items-start gap-2 bg-slate-950/60 p-2 rounded-lg border border-rose-900/40">
+                  <span class="w-3.5 h-3.5 rounded bg-rose-500 flex-shrink-0 mt-0.5"></span>
+                  <div>
+                    <span class="font-bold text-rose-300">Lengkung berwarna merah:</span>
+                    <span class="text-slate-300 block">Adalah <strong>busur lingkaran AB</strong> yang dihadapi secara bersamaan oleh sudut pusat dan sudut keliling.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Metrics & Real-time Math Proof -->
+          <div class="lg:col-span-4 space-y-4">
+            <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-indigo-900 uppercase">Sudut Pusat ($\angle AOB$)</span>
+                <span class="w-3 h-3 rounded-full bg-brand-600"></span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="metricCenterAngle" class="text-3xl font-extrabold text-brand-700">100.0°</span>
+                <span class="text-xs font-medium text-slate-500">dibentuk 2 jari-jari OA & OB</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-900 uppercase">Sudut Keliling ($\angle AC_1B$)</span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="metricInscribedAngle1" class="text-3xl font-extrabold text-emerald-700">50.0°</span>
+                <span class="text-xs font-medium text-slate-500">dibentuk 2 tali busur AC & BC</span>
+              </div>
+            </div>
+
+            <div id="metricCardC2" class="hidden p-4 rounded-2xl bg-purple-50/70 border border-purple-200 transition-all">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-purple-900 uppercase">Sudut Keliling 2 ($\angle AC_2B$)</span>
+                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+              </div>
+              <div class="mt-2 flex items-baseline gap-2">
+                <span id="metricInscribedAngle2" class="text-3xl font-extrabold text-purple-700">50.0°</span>
+                <span class="text-xs font-medium text-slate-500">menghadap busur yang sama</span>
+              </div>
+              <p class="mt-1 text-[11px] font-semibold text-purple-800">
+                <i class="fa-solid fa-equals mr-1"></i> Terbukti: $\angle AC_1B = \angle AC_2B$
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-900 text-white border border-slate-800 space-y-2.5">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Analisis Rasio Matematika Terkini:
+              </span>
+              <div class="flex items-center justify-between text-sm py-1 border-b border-slate-800">
+                <span class="text-slate-300">Rasio $\frac{\angle AOB}{\angle AC_1B}$</span>
+                <span id="metricRatio" class="font-mono font-bold text-emerald-400 text-base">2.000 ×</span>
+              </div>
+              <div class="p-2.5 bg-slate-800/80 rounded-xl text-xs space-y-1 text-slate-200">
+                <p id="proofEquationText" class="font-semibold text-emerald-300">100.0° = 2 × 50.0°</p>
+                <p class="text-[11px] text-slate-300">
+                  <i class="fa-solid fa-check-circle text-emerald-400 mr-1"></i> Teorema Sudut Keliling Terpenuhi!
+                </p>
+              </div>
+            </div>
+
+            <!-- Tombol Tambah ke Kotak Perbandingan -->
+            <button type="button" onclick="recordCurrentTrial()" 
+              class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-indigo-700 hover:from-brand-700 hover:to-indigo-800 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-brand-600/30 transition transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-bookmark text-amber-300"></i>
+              <span>Simpan ke Kotak Perbandingan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== KOTAK PERBANDINGAN DATA EKSPLORASI ==================== -->
+        <div class="mt-8 pt-8 border-t border-slate-200">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 gap-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-brand-600 animate-pulse"></span>
+                <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded-md">
+                  Tabel Komparasi Multi-Kasus
+                </span>
+              </div>
+              <h3 class="text-xl font-extrabold text-slate-900 mt-1 flex items-center gap-2">
+                <i class="fa-solid fa-table-columns text-brand-600"></i>
+                Kotak Perbandingan Sudut Pusat & Sudut Keliling
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+                Amati setidaknya 3 konfigurasi berbeda untuk menemukan pola invariansi hubungan sudut.
+              </p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+              <button type="button" onclick="fillPresetComparisons()" 
+                class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-brand-700 border border-brand-200 transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                <span>Muat 3 Kasus Sampel Otomatis</span>
+              </button>
+              <button type="button" onclick="resetComparisonTrials()" 
+                class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 transition" title="Kosongkan Kotak Perbandingan">
+                <i class="fa-solid fa-trash-can mr-1"></i> Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- 3 Interactive Comparison Cards Grid -->
+          <div id="comparisonCardsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- ==================== FORMULIR KESIMPULAN BERDASARKAN HASIL PERBANDINGAN ==================== -->
+        <div class="mt-8 p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-indigo-50/70 via-slate-50 to-white border-2 border-indigo-200/80 shadow-sm space-y-6">
+          <div class="flex items-start justify-between border-b border-indigo-100 pb-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-700 bg-indigo-100/70 px-2.5 py-0.5 rounded-md">
+                Sintesis & Generalisasi Teorema
+              </span>
+              <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1.5 flex items-center gap-2">
+                <i class="fa-solid fa-pen-nib text-brand-600"></i>
+                Formulir Kesimpulan Hasil Perbandingan Geometri
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-600 mt-1">
+                Lengkapilah pernyataan berikut berdasarkan pola keteraturan angka yang muncul pada 3 kotak perbandingan di atas!
+              </p>
+            </div>
+            <div class="hidden sm:block">
+              <div id="conclusionStatusBadge" class="px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300 rounded-lg text-xs font-bold flex items-center gap-1.5">
+                <i class="fa-solid fa-clock"></i> Belum Divalidasi
+              </div>
+            </div>
+          </div>
+
+          <!-- Guided Fill-in Questions -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm">
+            
+            <!-- Pertanyaan 1 -->
+            <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+              <label class="font-bold text-slate-800 block">
+                1. Hubungan Sudut Pusat ($\angle AOB$) terhadap Sudut Keliling ($\angle ACB$):
+              </label>
+              <p class="text-slate-500 text-xs">Jika kedua sudut menghadap busur yang sama, maka besar Sudut Pusat bernilai:</p>
+              <select id="conclusionQ1" class="w-full p-2.5 rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500 bg-slate-50 text-xs sm:text-sm font-semibold">
+                <option value="">-- Pilih Jawaban yang Tepat --</option>
+                <option value="double">2 Kali Lipat (Dua Kali) dari Sudut Keliling</option>
+                <option value="half">Setengah (1/2) dari Sudut Keliling</option>
+                <option value="equal">Sama Besar dengan Sudut Keliling</option>
+              </select>
+            </div>
+
+            <!-- Pertanyaan 2 -->
+            <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+              <label class="font-bold text-slate-800 block">
+                2. Hubungan Sudut Keliling ($\angle ACB$) terhadap Sudut Pusat ($\angle AOB$):
+              </label>
+              <p class="text-slate-500 text-xs">Sebaliknya, besar Sudut Keliling yang menghadap busur yang sama bernilai:</p>
+              <select id="conclusionQ2" class="w-full p-2.5 rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500 bg-slate-50 text-xs sm:text-sm font-semibold">
+                <option value="">-- Pilih Jawaban yang Tepat --</option>
+                <option value="double">Dua Kali Lipat dari Sudut Pusat</option>
+                <option value="half">Setengah (1/2) dari Sudut Pusat</option>
+                <option value="constant">Selalu Berubah-ubah tanpa Pola</option>
+              </select>
+            </div>
+
+            <!-- Pertanyaan 3 -->
+            <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+              <label class="font-bold text-slate-800 block">
+                3. Sifat Dua Sudut Keliling atau Lebih ($\angle AC_1B$ dan $\angle AC_2B$):
+              </label>
+              <p class="text-slate-500 text-xs">Jika beberapa sudut keliling menghadap busur lingkaran yang sama, maka besarnya:</p>
+              <select id="conclusionQ3" class="w-full p-2.5 rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500 bg-slate-50 text-xs sm:text-sm font-semibold">
+                <option value="">-- Pilih Jawaban yang Tepat --</option>
+                <option value="equal">Selalu Sama Besar (Konstan)</option>
+                <option value="different">Berbeda-beda sesuai letak pergeseran titik</option>
+                <option value="right">Selalu Berjumlah 180 Derajat</option>
+              </select>
+            </div>
+
+            <!-- Pertanyaan 4 -->
+            <div class="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm space-y-2">
+              <label class="font-bold text-slate-800 block">
+                4. Sudut Keliling Menghadap Garis Diameter ($180^\circ$ — Teorema Thales):
+              </label>
+              <p class="text-slate-500 text-xs">Sudut keliling yang menghadap diameter lingkaran selalu berukuran:</p>
+              <select id="conclusionQ4" class="w-full p-2.5 rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500 bg-slate-50 text-xs sm:text-sm font-semibold">
+                <option value="">-- Pilih Jawaban yang Tepat --</option>
+                <option value="90">Tepat 90° (Sudut Siku-Siku)</option>
+                <option value="180">Tepat 180° (Sudut Lurus)</option>
+                <option value="45">Tepat 45° (Sudut Lancip)</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Free-text Qualitative Argument -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-slate-800">
+              Rangkuman Kalimat Ilmiah / Penjelasan Bebas Kelompok Anda: <span class="text-red-500">*</span>
+            </label>
+            <textarea id="conclusionFreeText" rows="3" 
+              placeholder="Tuliskan argumen atau temuan utama kelompok Anda di sini (contoh: Kami mengamati bahwa berapapun nilai sudut pusat diubah, rasio perbandingannya selalu bernilai 2, sehingga sudut keliling adalah separuh sudut pusat...)"
+              class="w-full p-3 rounded-xl border border-slate-300 focus:border-brand-600 focus:ring-2 focus:ring-brand-500/20 text-xs sm:text-sm font-medium transition"></textarea>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <button type="button" onclick="validateGroupConclusion()" 
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-md shadow-emerald-600/30 transition transform hover:-translate-y-0.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Kunci & Validasi Kesimpulan Tim</span>
+            </button>
+
+            <span id="conclusionFeedbackText" class="text-xs font-semibold text-slate-500 text-center sm:text-right">
+              Isi semua opsi di atas lalu klik tombol validasi.
+            </span>
+          </div>
+
+          <!-- Alert Hasil Validasi Kesimpulan -->
+          <div id="conclusionAlertBox" class="hidden p-4 rounded-xl text-xs sm:text-sm border transition-all"></div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between">
+          <button onclick="goToStep(4)" class="px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50 transition">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Kembali
+          </button>
+          <button onclick="goToStep(6)" class="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 font-semibold text-white shadow-lg shadow-brand-600/30 transition">
+            Lanjut ke Kuis Penalaran HOTS <i class="fa-solid fa-arrow-right ml-1.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LANGKAH 6: EVALUASI KUIS HOTS ==================== -->
+    <section id="stepSection-6" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8">
+        <div class="pb-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md">
+              Tahap 6: Evaluasi Penalaran Tingkat Tinggi (HOTS)
+            </span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-2">
+              Tantangan Pemecahan Masalah Nyata Kelompok
+            </h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Uji ketajaman pemahaman teorema lingkaran kelompok Anda pada 4 skenario rekayasa dan navigasi.
+            </p>
+          </div>
+          <div class="px-4 py-2 bg-slate-900 text-white rounded-xl flex items-center gap-3">
+            <i class="fa-solid fa-award text-amber-400 text-2xl"></i>
+            <div>
+              <p class="text-[10px] text-slate-400 uppercase font-semibold">Skor Kelompok</p>
+              <p id="quizScoreDisplay" class="text-xl font-black text-amber-300">0 / 100</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="quizContainer" class="mt-8 space-y-8">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <button onclick="goToStep(5)" class="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-300 font-semibold text-slate-600 hover:bg-slate-50 transition">
+            <i class="fa-solid fa-arrow-left mr-1.5"></i> Buka Kanvas Dinamis Lagi
+          </button>
+          
+          <button onclick="finishEvaluation()" id="btnFinishQuiz"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5">
+            <i class="fa-solid fa-file-pdf"></i> Siapkan & Cetak Dokumen PDF Lengkap
+          </button>
+        </div>
+
+        <!-- Summary Banner -->
+        <div id="summaryBannerBox" class="hidden mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white border border-indigo-700/50 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-check-double text-3xl text-emerald-400"></i>
+            <div>
+              <h3 class="font-bold text-base">Portofolio Pembelajaran Berhasil Disusun!</h3>
+              <p class="text-xs text-slate-300">Foto hasil kerja fisik, tabel kotak perbandingan sudut, gambar kanvas, simpulan tim, dan hasil kuis HOTS telah dirangkum ke format cetak PDF.</p>
+            </div>
+          </div>
+          <button onclick="triggerPrintPdf()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs shadow-lg transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> Cetak / Simpan PDF Sekarang
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== DOKUMEN CETAK PDF RESMI (A4 PRINTABLE REPORT) ==================== -->
+  <div id="printablePdfReport" class="hidden print:block max-w-4xl mx-auto p-8 bg-white text-slate-900">
+    
+    <!-- KOP LAPORAN RESMI -->
+    <div class="border-b-2 border-slate-900 pb-4 mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-black uppercase tracking-wider text-slate-900">LAPORAN PORTOFOLIO PENYELIDIKAN MATEMATIKA</h1>
+          <p class="text-xs font-bold text-slate-700 mt-0.5">Materi: Hubungan Sudut Pusat, Sudut Keliling, dan Sifat Turunannya</p>
+          <p class="text-xs text-slate-600">Kurikulum Merdeka • Fase F (Kelas XI SMA) • Model Pembelajaran Guided Discovery Learning</p>
+        </div>
+        <div class="text-right">
+          <span class="inline-block px-3 py-1 bg-slate-900 text-white font-mono text-xs font-bold rounded">
+            NILAI HOTS: <span id="pdfFinalScoreBadge">0/100</span>
+          </span>
+          <p class="text-[10px] text-slate-500 mt-1">Dicetak: <span id="pdfPrintDate"></span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 1: IDENTITAS KELOMPOK & ANGGOTA -->
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase tracking-wider bg-slate-100 px-3 py-1.5 border-l-4 border-slate-900 text-slate-900 mb-3">
+        I. Identitas Kelompok & Pembagian Peran Investigasi
+      </h2>
+      <div class="grid grid-cols-2 gap-4 mb-3 text-xs">
+        <div><span class="font-bold">Nama Kelompok / Tim:</span> <span id="pdfGroupName" class="font-semibold text-indigo-900">Archimedes</span></div>
+        <div><span class="font-bold">Status Pembuktian:</span> <span id="pdfVerificationStatus" class="font-semibold text-emerald-800">Terbukti Valid</span></div>
+      </div>
+
+      <table class="w-full text-xs border-collapse border border-slate-400">
+        <thead>
+          <tr class="bg-slate-200 text-slate-800">
+            <th class="border border-slate-400 px-2 py-1.5 text-center w-10">No</th>
+            <th class="border border-slate-400 px-3 py-1.5 text-left">Nama Anggota</th>
+            <th class="border border-slate-400 px-3 py-1.5 text-left">Peran Khusus Penyelidikan</th>
+            <th class="border border-slate-400 px-3 py-1.5 text-center w-28">Status</th>
+          </tr>
+        </thead>
+        <tbody id="pdfMembersTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BAGIAN 2: BUKTI DOKUMENTASI FISIK DAN PENGUKURAN -->
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase tracking-wider bg-slate-100 px-3 py-1.5 border-l-4 border-slate-900 text-slate-900 mb-3">
+        II. Dokumentasi Lukisan Fisik & Verifikasi Numerik
+      </h2>
+
+      <div class="grid grid-cols-12 gap-4 items-center mb-4">
+        <!-- Student Drawing Snapshot -->
+        <div class="col-span-5 border border-slate-300 rounded p-2 text-center bg-slate-50">
+          <p class="text-[10px] font-bold text-slate-600 mb-1">Foto Asli Lukisan Kertas Siswa (Jangka & Busur)</p>
+          <img id="pdfCapturedImage" src="" alt="Bukti Foto Lukisan Siswa" class="w-full h-44 object-contain rounded border border-slate-200 bg-white" />
+          <p id="pdfImageNote" class="text-[9px] text-slate-500 italic mt-1">*Diunggah / difoto langsung oleh siswa saat praktikum</p>
+        </div>
+
+        <!-- Verification Calculation Table -->
+        <div class="col-span-7">
+          <table class="w-full text-xs border-collapse border border-slate-400">
+            <thead>
+              <tr class="bg-slate-200">
+                <th class="border border-slate-400 px-2 py-1 text-left">Parameter Geometri</th>
+                <th class="border border-slate-400 px-2 py-1 text-center">Pengukuran Fisik</th>
+                <th class="border border-slate-400 px-2 py-1 text-center">Teori Matematika</th>
+                <th class="border border-slate-400 px-2 py-1 text-center">Galat (Selisih)</th>
+              </tr>
+            </thead>
+            <tbody id="pdfMeasurementTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+
+          <div class="mt-2 p-2 bg-slate-50 border border-slate-200 rounded text-[11px] leading-relaxed">
+            <span class="font-bold text-slate-800">Catatan Analisis Presisi Pengukuran Fisik:</span>
+            <p id="pdfMeasurementAnalysisText" class="text-slate-600 mt-0.5">
+              Toleransi pembacaan busur derajat manual kelompok Anda sebesar $\pm 4^\circ$.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- BAGIAN 3: SIMULASI KANVAS DINAMIS & KOTAK PERBANDINGAN DIGITAL -->
+    <div class="mb-6 pt-4">
+      <h2 class="text-sm font-bold uppercase tracking-wider bg-slate-100 px-3 py-1.5 border-l-4 border-slate-900 text-slate-900 mb-3">
+        III. Verifikasi Simulasi Kanvas Digital & Tabel Perbandingan Eksplorasi
+      </h2>
+
+      <div class="grid grid-cols-12 gap-4 items-center mb-3">
+        <div class="col-span-6 border border-slate-300 rounded p-2 text-center bg-slate-50">
+          <p class="text-[10px] font-bold text-slate-600 mb-1">Tangkapan Layar Kanvas Interaktif</p>
+          <img id="pdfCanvasSnapshot" src="" alt="Snapshot Kanvas Digital" class="w-full h-44 object-contain rounded border border-slate-200 bg-slate-950" />
+        </div>
+        <div class="col-span-6 space-y-2 text-xs">
+          <div class="p-2 border border-slate-300 rounded bg-slate-50">
+            <span class="font-bold block text-slate-800">Keterangan Geometri Garis Kanvas:</span>
+            <ul class="text-[11px] text-slate-700 mt-1 space-y-1 list-disc pl-4">
+              <li><strong>Garis warna biru (garis OA dan garis OB):</strong> Dua jari-jari lingkaran pembentuk Sudut Pusat ($\angle AOB$).</li>
+              <li><strong>Garis warna hijau (garis AC dan garis BC):</strong> Dua tali busur pembentuk Sudut Keliling ($\angle ACB$).</li>
+              <li><strong>Garis kuning/amber (garis AB):</strong> Garis tali busur alas AB.</li>
+              <li><strong>Lengkungan merah:</strong> Busur lingkaran AB yang dihadapi secara bersamaan.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabel Hasil Kotak Perbandingan di Laporan PDF -->
+      <div class="mt-3">
+        <p class="text-xs font-bold text-slate-800 mb-1">Tabel Sampling Perbandingan Tiga Uji Coba (Eksplorasi Kanvas):</p>
+        <table class="w-full text-xs border-collapse border border-slate-400">
+          <thead>
+            <tr class="bg-slate-200">
+              <th class="border border-slate-400 px-2 py-1 text-center w-16">Uji Coba</th>
+              <th class="border border-slate-400 px-2 py-1 text-center">Sudut Pusat ($\angle AOB$)</th>
+              <th class="border border-slate-400 px-2 py-1 text-center">Sudut Keliling ($\angle ACB$)</th>
+              <th class="border border-slate-400 px-2 py-1 text-center">Rasio ($\angle AOB / \angle ACB$)</th>
+              <th class="border border-slate-400 px-3 py-1 text-left">Pola Kesimpulan Baris</th>
+            </tr>
+          </thead>
+          <tbody id="pdfComparisonTableBody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: KESIMPULAN TEOREMA & SIMPULAN MANDIRI SISWA -->
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase tracking-wider bg-slate-100 px-3 py-1.5 border-l-4 border-slate-900 text-slate-900 mb-3">
+        IV. Rangkuman Kesimpulan Ilmiah & Temuan Penyelidikan Kelompok
+      </h2>
+
+      <div class="space-y-2.5 text-xs text-slate-800 leading-relaxed">
+        <div class="p-2.5 border border-slate-300 rounded bg-slate-50">
+          <strong class="text-indigo-900 block font-bold">1. Teorema Sudut Pusat dan Sudut Keliling:</strong>
+          Besar sudut pusat lingkaran (dibentuk oleh dua jari-jari) adalah dua kali besar sudut keliling (dibentuk oleh dua tali busur) jika kedua sudut tersebut menghadap busur yang sama:
+          $$\angle AOB = 2 \times \angle ACB \iff \angle ACB = \frac{1}{2} \angle AOB$$
+        </div>
+
+        <div class="p-2.5 border border-slate-300 rounded bg-slate-50">
+          <strong class="text-emerald-900 block font-bold">2. Sifat Turunan 1 (Sudut Keliling Menghadap Busur yang Sama):</strong>
+          Semua sudut keliling yang menghadap busur yang sama besarnya adalah sama besar:
+          $$\angle AC_1B = \angle AC_2B = \angle AC_nB$$
+        </div>
+
+        <div class="p-2.5 border border-slate-300 rounded bg-slate-50">
+          <strong class="text-amber-900 block font-bold">3. Sifat Turunan 2 (Teorema Thales — Menghadap Diameter):</strong>
+          Sudut keliling yang menghadap diameter lingkaran besarnya selalu tepat $90^\circ$ (sudut siku-siku):
+          $$\angle APB = \frac{1}{2} \times 180^\circ = 90^\circ$$
+        </div>
+
+        <!-- Simpulan Asli Siswa -->
+        <div class="p-2.5 border-2 border-indigo-200 rounded bg-indigo-50/50">
+          <strong class="text-indigo-950 block font-bold">Catatan Kesimpulan Asli Tim Berdasarkan Tabel Perbandingan:</strong>
+          <p id="pdfStudentConclusionText" class="mt-1 italic text-slate-700">
+            "Belum ada catatan simpulan yang dikunci."
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BAGIAN 5: REKAPITULASI KUIS EVALUASI HOTS -->
+    <div class="mb-6">
+      <h2 class="text-sm font-bold uppercase tracking-wider bg-slate-100 px-3 py-1.5 border-l-4 border-slate-900 text-slate-900 mb-3">
+        V. Rekapitulasi Evaluasi Penalaran Tingkat Tinggi (HOTS)
+      </h2>
+      <table class="w-full text-xs border-collapse border border-slate-400">
+        <thead>
+          <tr class="bg-slate-200">
+            <th class="border border-slate-400 px-2 py-1 text-center w-8">No</th>
+            <th class="border border-slate-400 px-3 py-1 text-left">Kasus Penerimaan Kontekstual</th>
+            <th class="border border-slate-400 px-3 py-1 text-left">Jawaban Kelompok</th>
+            <th class="border border-slate-400 px-2 py-1 text-center w-20">Hasil</th>
+            <th class="border border-slate-400 px-2 py-1 text-center w-16">Poin</th>
+          </tr>
+        </thead>
+        <tbody id="pdfQuizTableBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LEMBAR PENGESAHAN TANDA TANGAN -->
+    <div class="mt-8 pt-4 border-t border-slate-300">
+      <div class="grid grid-cols-2 text-center text-xs">
+        <div>
+          <p class="font-semibold text-slate-700">Ketua Kelompok Penyelidik,</p>
+          <div class="h-16"></div>
+          <p id="pdfSignatureLeader" class="font-bold underline text-slate-900">(....................................................)</p>
+          <p class="text-[10px] text-slate-500">NISN Anggota</p>
+        </div>
+        <div>
+          <p class="font-semibold text-slate-700">Guru Pengampu Matematika Fase F,</p>
+          <div class="h-16"></div>
+          <p class="font-bold underline text-slate-900">(....................................................)</p>
+          <p class="text-[10px] text-slate-500">NIP. Guru Pengampu</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 mt-12 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p class="font-medium">
+        Media Pembelajaran Matematika SMA Fase F &copy; Kurikulum Merdeka • Sifat Lingkaran & Turunannya
+      </p>
+      <div class="flex items-center gap-3 text-slate-400">
+        <span class="flex items-center gap-1"><i class="fa-solid fa-wifi text-emerald-500"></i> Mode Offline Friendly</span>
+        <span>•</span>
+        <span>Format Ekspor Laporan PDF Terintegrasi</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JAVASCRIPT ENGINE ==================== -->
+  <script>
+    /* ==========================================================
+       GLOBAL STATE & APPLICATION DATA
+    ========================================================== */
+    let currentStep = 1;
+    let groupData = {
+      name: "",
+      members: [
+        { name: "Siswa 1", role: "Ketua Kelompok" },
+        { name: "Siswa 2", role: "Analis Geometri (Jangka)" }
+      ]
+    };
+
+    const ROLE_OPTIONS = [
+      "Ketua Kelompok",
+      "Analis Geometri (Jangka)",
+      "Pengukur & Verifikator Busur",
+      "Pencatat Data",
+      "Presenter",
+      "Anggota Pendukung"
+    ];
+
+    let cameraStream = null;
+    let physicalVerificationData = {
+      centerAngle: null,
+      inscribedAngle: null,
+      inscribedAngle2: null,
+      isValid: false,
+      delta: null
+    };
+
+    /* State: Kotak Perbandingan & Simpulan Siswa */
+    let comparisonTrials = [
+      { id: 1, label: "Uji Coba 1", centerAngle: null, inscribedAngle: null, ratio: null, filled: false },
+      { id: 2, label: "Uji Coba 2", centerAngle: null, inscribedAngle: null, ratio: null, filled: false },
+      { id: 3, label: "Uji Coba 3", centerAngle: null, inscribedAngle: null, ratio: null, filled: false }
+    ];
+
+    let studentConclusionState = {
+      q1: "",
+      q2: "",
+      q3: "",
+      q4: "",
+      freeText: "",
+      isValidated: false
+    };
+
+    /* KaTeX Safe Render Helper dengan Proteksi Re-render */
+    function triggerKaTeX(el) {
+      if (window.renderMathInElement) {
+        try {
+          renderMathInElement(el || document.body, {
+            delimiters: [
+              { left: '$$', right: '$$', display: true },
+              { left: '$', right: '$', display: false }
+            ],
+            ignoredClasses: ["katex", "no-katex"],
+            throwOnError: false
+          });
+        } catch (err) {
+          console.warn("KaTeX non-critical warning:", err);
+        }
+      }
+    }
+
+    /* ==========================================================
+       STEP NAVIGATION
+    ========================================================== */
+    function goToStep(stepNumber) {
+      if (stepNumber < 1 || stepNumber > 6) return;
+
+      if (stepNumber > 1 && (!groupData.name || groupData.name.trim() === "")) {
+        alert("Harap masukkan Nama Kelompok terlebih dahulu pada Langkah 1!");
+        return;
+      }
+
+      for (let i = 1; i <= 6; i++) {
+        const sec = document.getElementById(`stepSection-${i}`);
+        if (sec) sec.classList.add('hidden');
+
+        const tab = document.getElementById(`stepTab-${i}`);
+        if (tab) {
+          tab.classList.remove('step-active', 'step-completed', 'step-inactive');
+          if (i === stepNumber) {
+            tab.classList.add('step-active');
+          } else if (i < stepNumber) {
+            tab.classList.add('step-completed');
+          } else {
+            tab.classList.add('step-inactive');
+          }
+        }
+      }
+
+      const activeSec = document.getElementById(`stepSection-${stepNumber}`);
+      if (activeSec) {
+        activeSec.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      currentStep = stepNumber;
+
+      if (stepNumber === 3) {
+        renderRoleCards();
+      } else if (stepNumber === 5) {
+        initGeomCanvas();
+        renderComparisonCards();
+      }
+
+      setTimeout(() => triggerKaTeX(activeSec), 50);
+    }
+
+    /* ==========================================================
+       LANGKAH 1: REGISTRASI TIM DINAMIS
+    ========================================================== */
+    function renderMembersList() {
+      const container = document.getElementById('membersContainer');
+      const countText = document.getElementById('memberCountText');
+      const btnAdd = document.getElementById('btnAddMember');
+
+      container.innerHTML = '';
+      countText.innerText = `${groupData.members.length} / 6 Anggota`;
+
+      if (groupData.members.length >= 6) {
+        btnAdd.disabled = true;
+        btnAdd.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        btnAdd.disabled = false;
+        btnAdd.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
+      groupData.members.forEach((member, index) => {
+        const row = document.createElement('div');
+        row.className = "flex flex-col sm:flex-row items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200 transition";
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = "w-full sm:flex-1";
+        nameDiv.innerHTML = `
+          <input type="text" value="${member.name}" placeholder="Nama Lengkap Anggota ${index + 1}" required
+            onchange="updateMemberName(${index}, this.value)"
+            class="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500" />
+        `;
+
+        const roleDiv = document.createElement('div');
+        roleDiv.className = "w-full sm:w-64";
+        let roleOptionsHtml = ROLE_OPTIONS.map(role => 
+          `<option value="${role}" ${member.role === role ? 'selected' : ''}>${role}</option>`
+        ).join('');
+
+        roleDiv.innerHTML = `
+          <select onchange="updateMemberRole(${index}, this.value)"
+            class="w-full px-3 py-2 text-xs font-medium rounded-lg border border-slate-300 focus:border-brand-600 focus:ring-1 focus:ring-brand-500 bg-white">
+            ${roleOptionsHtml}
+          </select>
+        `;
+
+        const delDiv = document.createElement('div');
+        const isOnlyOne = groupData.members.length <= 1;
+        delDiv.innerHTML = `
+          <button type="button" onclick="removeMemberField(${index})" ${isOnlyOne ? 'disabled' : ''}
+            class="${isOnlyOne ? 'opacity-30 cursor-not-allowed text-slate-400' : 'text-rose-500 hover:text-rose-700 hover:bg-rose-50'} p-2 rounded-lg transition" title="Hapus Anggota">
+            <i class="fa-solid fa-trash-can text-sm"></i>
+          </button>
+        `;
+
+        row.appendChild(nameDiv);
+        row.appendChild(roleDiv);
+        row.appendChild(delDiv);
+        container.appendChild(row);
+      });
+    }
+
+    function addMemberField() {
+      if (groupData.members.length < 6) {
+        const nextRole = ROLE_OPTIONS[groupData.members.length] || "Anggota Pendukung";
+        groupData.members.push({
+          name: `Siswa ${groupData.members.length + 1}`,
+          role: nextRole
+        });
+        renderMembersList();
+      }
+    }
+
+    function removeMemberField(index) {
+      if (groupData.members.length > 1) {
+        groupData.members.splice(index, 1);
+        renderMembersList();
+      }
+    }
+
+    function updateMemberName(index, value) {
+      groupData.members[index].name = value;
+    }
+
+    function updateMemberRole(index, value) {
+      groupData.members[index].role = value;
+    }
+
+    function handleGroupSubmit(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('groupNameInput').value;
+      if (!nameInput.trim()) {
+        alert("Harap masukkan nama kelompok.");
+        return;
+      }
+      groupData.name = nameInput.trim();
+
+      document.getElementById('badgeGroupName').innerText = groupData.name;
+      document.getElementById('headerGroupBadge').classList.remove('hidden');
+
+      goToStep(2);
+    }
+
+    /* ==========================================================
+       LANGKAH 3: PEMBAGIAN TUGAS KELOMPOK
+    ========================================================== */
+    function renderRoleCards() {
+      const container = document.getElementById('roleCardsGrid');
+      container.innerHTML = '';
+
+      groupData.members.forEach((m) => {
+        let roleIcon = "fa-user-gear";
+        let roleDesc = "Membantu koordinasi kelancaran investigasi kelompok.";
+
+        if (m.role.includes("Ketua")) {
+          roleIcon = "fa-crown text-amber-500";
+          roleDesc = "Mengkoordinasi manajemen waktu, pembagian kerja, dan kesimpulan kelompok.";
+        } else if (m.role.includes("Jangka")) {
+          roleIcon = "fa-compass-drafting text-brand-500";
+          roleDesc = "Melukis lingkaran berjari-jari tetap dan garis sudut secara presisi di kertas kerja.";
+        } else if (m.role.includes("Pengukur")) {
+          roleIcon = "fa-ruler-combined text-emerald-500";
+          roleDesc = "Membaca busur derajat secara teliti dan memeriksa letak titik pada busur lingkaran.";
+        } else if (m.role.includes("Pencatat")) {
+          roleIcon = "fa-pen-to-square text-sky-500";
+          roleDesc = "Mencatat derajat sudut numerik dan memasukkannya ke sistem verifikasi.";
+        } else if (m.role.includes("Presenter")) {
+          roleIcon = "fa-chalkboard-user text-purple-500";
+          roleDesc = "Menyiapkan penyampaian hasil temuan dan memimpin presentasi di depan kelas.";
+        }
+
+        const card = document.createElement('div');
+        card.className = "bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-sm flex items-start gap-3";
+        card.innerHTML = `
+          <div class="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid ${roleIcon}"></i>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">${m.role}</span>
+            <h5 class="text-xs font-bold text-slate-800">${m.name}</h5>
+            <p class="text-[11px] text-slate-500 mt-1 leading-snug">${roleDesc}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* ==========================================================
+       LANGKAH 4: KAMERA & VERIFIKASI PENGUKURAN FISIK
+    ========================================================== */
+    async function startCamera() {
+      const video = document.getElementById('webcamFeed');
+      const placeholder = document.getElementById('cameraPlaceholder');
+      const btnCapture = document.getElementById('btnCapturePhoto');
+      const btnStart = document.getElementById('btnStartCamera');
+      const previewImg = document.getElementById('capturedImagePreview');
+
+      try {
+        previewImg.classList.add('hidden');
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        video.srcObject = cameraStream;
+        video.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        btnCapture.disabled = false;
+        btnStart.innerHTML = `<i class="fa-solid fa-stop"></i> Matikan Kamera`;
+        btnStart.setAttribute('onclick', 'stopCamera()');
+      } catch (err) {
+        console.error("Camera access error:", err);
+        alert("Akses kamera tidak diizinkan atau tidak didukung pada peramban ini. Anda dapat mengunggah file foto lukisan langsung menggunakan tombol 'Unggah Gambar'.");
+      }
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      const video = document.getElementById('webcamFeed');
+      const btnCapture = document.getElementById('btnCapturePhoto');
+      const btnStart = document.getElementById('btnStartCamera');
+      video.classList.add('hidden');
+      btnCapture.disabled = true;
+      btnStart.innerHTML = `<i class="fa-solid fa-video"></i> Aktifkan Kamera`;
+      btnStart.setAttribute('onclick', 'startCamera()');
+    }
+
+    function captureSnapshot() {
+      const video = document.getElementById('webcamFeed');
+      const canvas = document.getElementById('snapshotCanvas');
+      const preview = document.getElementById('capturedImagePreview');
+
+      if (!video || !video.videoWidth) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      preview.src = dataUrl;
+      preview.classList.remove('hidden');
+      video.classList.add('hidden');
+
+      stopCamera();
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const preview = document.getElementById('capturedImagePreview');
+        const placeholder = document.getElementById('cameraPlaceholder');
+        const video = document.getElementById('webcamFeed');
+
+        preview.src = e.target.result;
+        preview.classList.remove('hidden');
+        video.classList.add('hidden');
+        placeholder.classList.add('hidden');
+        stopCamera();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function verifyPhysicalMeasurement() {
+      const centerInput = parseFloat(document.getElementById('inputCenterAngle').value);
+      const inscribedInput = parseFloat(document.getElementById('inputInscribedAngle').value);
+      const inscribed2Input = parseFloat(document.getElementById('inputInscribedAngle2').value);
+      const resBox = document.getElementById('verificationResultBox');
+
+      if (isNaN(centerInput) || isNaN(inscribedInput)) {
+        resBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-rose-50 border-rose-200 text-rose-700";
+        resBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation"></i> Data Belum Lengkap</div>
+          <p class="mt-0.5">Harap masukkan nilai Sudut Pusat dan Sudut Keliling dari hasil pengukuran busur derajat Anda.</p>
+        `;
+        resBox.classList.remove('hidden');
+        return;
+      }
+
+      const expectedInscribed = centerInput / 2;
+      const delta = Math.abs(inscribedInput - expectedInscribed);
+      const tolerance = 4.0;
+
+      resBox.classList.remove('hidden');
+
+      physicalVerificationData.centerAngle = centerInput;
+      physicalVerificationData.inscribedAngle = inscribedInput;
+      physicalVerificationData.inscribedAngle2 = isNaN(inscribed2Input) ? null : inscribed2Input;
+      physicalVerificationData.delta = delta;
+
+      if (delta <= tolerance) {
+        physicalVerificationData.isValid = true;
+
+        let extraCorollaryCheck = "";
+        if (!isNaN(inscribed2Input)) {
+          const delta2 = Math.abs(inscribedInput - inscribed2Input);
+          if (delta2 <= tolerance) {
+            extraCorollaryCheck = `<p class="mt-2 text-emerald-800 font-semibold bg-emerald-100/70 p-2 rounded-lg">
+              ✨ <strong>Sifat Turunan Terbukti:</strong> Sudut keliling 1 ($${inscribedInput}^\\circ$) dan Sudut keliling 2 ($${inscribed2Input}^\\circ$) bernilai hampir identik (selisih hanya $${delta2.toFixed(1)}^\\circ$)!
+            </p>`;
+          }
+        }
+
+        resBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 border border-emerald-300 text-emerald-800";
+        resBox.innerHTML = `
+          <div class="font-extrabold text-emerald-900 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
+            VALID & TERBUKTI SECARA MATEMATIS!
+          </div>
+          <p class="mt-1">
+            Sudut Pusat: <strong>${centerInput}°</strong> | Sudut Keliling: <strong>${inscribedInput}°</strong>.
+          </p>
+          <p class="mt-1">
+            Nilai ideal teori: $\\frac{1}{2} \\times ${centerInput}^\\circ = ${expectedInscribed.toFixed(1)}^\\circ$. Selisih ketelitian busur fisik kelompok Anda adalah <strong>${delta.toFixed(1)}°</strong> (masih dalam batas presisi $\\pm ${tolerance}^\\circ$).
+          </p>
+          ${extraCorollaryCheck}
+        `;
+        triggerConfetti();
+      } else {
+        physicalVerificationData.isValid = false;
+        resBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-amber-50 border border-amber-300 text-amber-800";
+        resBox.innerHTML = `
+          <div class="font-extrabold text-amber-900 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-lg"></i>
+            Perlu Verifikasi Ulang Ketelitian Menggambar
+          </div>
+          <p class="mt-1">
+            Sudut Pusat terukur <strong>${centerInput}°</strong> seharusnya menghasilkan Sudut Keliling sekitar <strong>${expectedInscribed.toFixed(1)}°</strong>. Data Anda mencatat <strong>${inscribedInput}°</strong> (selisih ${delta.toFixed(1)}° > ambang toleransi ${tolerance}°).
+          </p>
+        `;
+      }
+
+      triggerKaTeX(resBox);
+    }
+
+    /* ==========================================================
+       LANGKAH 5: DYNAMIC GEOMETRY CANVAS ENGINE
+    ========================================================== */
+    let canvas, ctx;
+    const circleConfig = { cx: 300, cy: 230, radius: 165 };
+
+    let angleA = 3.8;
+    let angleB = 5.6;
+    let angleC1 = 1.57;
+    let angleC2 = 1.0;
+
+    let showC2 = false;
+    let diameterMode = false;
+    let draggingPoint = null;
+
+    let currentLiveDeg = { central: 100.0, inscribed: 50.0, ratio: 2.0 };
+
+    function initGeomCanvas() {
+      canvas = document.getElementById('geomCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+
+      canvas.onpointerdown = handleCanvasPointerDown;
+      canvas.onpointermove = handleCanvasPointerMove;
+      canvas.onpointerup = handleCanvasPointerUp;
+      canvas.onpointercancel = handleCanvasPointerUp;
+
+      drawGeomScene();
+    }
+
+    function getPointCoords(angle) {
+      return {
+        x: circleConfig.cx + circleConfig.radius * Math.cos(angle),
+        y: circleConfig.cy + circleConfig.radius * Math.sin(angle)
+      };
+    }
+
+    function normalizeAngle(a) {
+      while (a < 0) a += Math.PI * 2;
+      while (a >= Math.PI * 2) a -= Math.PI * 2;
+      return a;
+    }
+
+    function calculateShortestArcAngle(a1, a2) {
+      let diff = Math.abs(normalizeAngle(a1) - normalizeAngle(a2));
+      if (diff > Math.PI) diff = 2 * Math.PI - diff;
+      return diff;
+    }
+
+    function calculateInscribedAngle(pA, pB, pC) {
+      const v1 = { x: pA.x - pC.x, y: pA.y - pC.y };
+      const v2 = { x: pB.x - pC.x, y: pB.y - pC.y };
+
+      const dot = v1.x * v2.x + v1.y * v2.y;
+      const mag1 = Math.hypot(v1.x, v1.y);
+      const mag2 = Math.hypot(v2.x, v2.y);
+
+      if (mag1 === 0 || mag2 === 0) return 0;
+      const cosTheta = Math.max(-1, Math.min(1, dot / (mag1 * mag2)));
+      return Math.acos(cosTheta);
+    }
+
+    function drawGeomScene() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const pA = getPointCoords(angleA);
+      const pB = getPointCoords(angleB);
+      const pC1 = getPointCoords(angleC1);
+      const pC2 = getPointCoords(angleC2);
+      const pO = { x: circleConfig.cx, y: circleConfig.cy };
+
+      // 1. Lingkaran Dasar
+      ctx.beginPath();
+      ctx.arc(pO.x, pO.y, circleConfig.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // 2. Busur Lingkaran AB
+      ctx.beginPath();
+      let startA = normalizeAngle(angleA);
+      let endB = normalizeAngle(angleB);
+      let diff = endB - startA;
+      if (diff < 0) diff += Math.PI * 2;
+
+      if (diff <= Math.PI) {
+        ctx.arc(pO.x, pO.y, circleConfig.radius, startA, endB, false);
+      } else {
+        ctx.arc(pO.x, pO.y, circleConfig.radius, endB, startA, false);
+      }
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 5.5;
+      ctx.stroke();
+
+      // 3. Tali Busur AB (Amber putus-putus)
+      ctx.beginPath();
+      ctx.moveTo(pA.x, pA.y);
+      ctx.lineTo(pB.x, pB.y);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.2;
+      ctx.setLineDash([5, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 4. Dua Jari-Jari Lingkaran OA & OB (Biru Indigo)
+      ctx.beginPath();
+      ctx.moveTo(pO.x, pO.y);
+      ctx.lineTo(pA.x, pA.y);
+      ctx.moveTo(pO.x, pO.y);
+      ctx.lineTo(pB.x, pB.y);
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 2.6;
+      ctx.stroke();
+
+      // 5. Dua Tali Busur Sudut Keliling AC & BC (Hijau Emerald)
+      ctx.beginPath();
+      ctx.moveTo(pC1.x, pC1.y);
+      ctx.lineTo(pA.x, pA.y);
+      ctx.moveTo(pC1.x, pC1.y);
+      ctx.lineTo(pB.x, pB.y);
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.6;
+      ctx.stroke();
+
+      // 6. Sudut Keliling Kedua C2 (Jika aktif)
+      if (showC2) {
+        ctx.beginPath();
+        ctx.moveTo(pC2.x, pC2.y);
+        ctx.lineTo(pA.x, pA.y);
+        ctx.moveTo(pC2.x, pC2.y);
+        ctx.lineTo(pB.x, pB.y);
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 7. Simpul Titik Sudut Interaktif
+      drawHandle(pO.x, pO.y, 'O (Pusat)', '#94a3b8', 6);
+      drawHandle(pA.x, pA.y, 'A', '#f43f5e', 9);
+      drawHandle(pB.x, pB.y, 'B', '#f43f5e', 9);
+      drawHandle(pC1.x, pC1.y, 'C₁', '#10b981', 9);
+
+      if (showC2) {
+        drawHandle(pC2.x, pC2.y, 'C₂', '#a855f7', 9);
+      }
+
+      updateMetrics(pA, pB, pC1, pC2);
+    }
+
+    function drawHandle(x, y, label, color, r = 8) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, r + 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.25;
+      ctx.fill();
+
+      ctx.globalAlpha = 1.0;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.font = 'bold 12px Poppins, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#000000';
+      ctx.shadowBlur = 4;
+      ctx.fillText(label, x + 12, y + 4);
+      ctx.restore();
+    }
+
+    function updateMetrics(pA, pB, pC1, pC2) {
+      const centralRad = calculateShortestArcAngle(angleA, angleB);
+      const inscribedRad1 = calculateInscribedAngle(pA, pB, pC1);
+      const inscribedRad2 = calculateInscribedAngle(pA, pB, pC2);
+
+      const centralDeg = (centralRad * 180 / Math.PI);
+      const inscribedDeg1 = (inscribedRad1 * 180 / Math.PI);
+      const inscribedDeg2 = (inscribedRad2 * 180 / Math.PI);
+
+      const ratio = inscribedDeg1 > 0 ? (centralDeg / inscribedDeg1) : 2.0;
+
+      currentLiveDeg = {
+        central: centralDeg,
+        inscribed: inscribedDeg1,
+        ratio: ratio
+      };
+
+      document.getElementById('metricCenterAngle').innerText = centralDeg.toFixed(1) + '°';
+      document.getElementById('metricInscribedAngle1').innerText = inscribedDeg1.toFixed(1) + '°';
+      document.getElementById('metricRatio').innerText = ratio.toFixed(3) + ' ×';
+
+      document.getElementById('proofEquationText').innerText = 
+        `${centralDeg.toFixed(1)}° ≈ 2 × ${inscribedDeg1.toFixed(1)}°`;
+
+      if (showC2) {
+        document.getElementById('metricInscribedAngle2').innerText = inscribedDeg2.toFixed(1) + '°';
+      }
+    }
+
+    function handleCanvasPointerDown(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      const pA = getPointCoords(angleA);
+      const pB = getPointCoords(angleB);
+      const pC1 = getPointCoords(angleC1);
+      const pC2 = getPointCoords(angleC2);
+
+      const dist = (p) => Math.hypot(p.x - mx, p.y - my);
+
+      if (dist(pA) < 25) draggingPoint = 'A';
+      else if (dist(pB) < 25) draggingPoint = 'B';
+      else if (dist(pC1) < 25) draggingPoint = 'C1';
+      else if (showC2 && dist(pC2) < 25) draggingPoint = 'C2';
+    }
+
+    function handleCanvasPointerMove(e) {
+      if (!draggingPoint) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      const angle = Math.atan2(my - circleConfig.cy, mx - circleConfig.cx);
+
+      if (draggingPoint === 'A') {
+        angleA = angle;
+        if (diameterMode) angleB = normalizeAngle(angleA + Math.PI);
+      } else if (draggingPoint === 'B') {
+        angleB = angle;
+        if (diameterMode) angleA = normalizeAngle(angleB + Math.PI);
+      } else if (draggingPoint === 'C1') {
+        angleC1 = angle;
+      } else if (draggingPoint === 'C2') {
+        angleC2 = angle;
+      }
+
+      drawGeomScene();
+    }
+
+    function handleCanvasPointerUp() {
+      draggingPoint = null;
+    }
+
+    function toggleSecondInscribedAngle() {
+      showC2 = !showC2;
+      const btn = document.getElementById('toggleSecondAngleBtn');
+      const cardC2 = document.getElementById('metricCardC2');
+
+      if (showC2) {
+        btn.classList.add('bg-purple-100', 'border-purple-400', 'text-purple-900');
+        cardC2.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-purple-100', 'border-purple-400', 'text-purple-900');
+        cardC2.classList.add('hidden');
+      }
+      drawGeomScene();
+    }
+
+    function toggleDiameterMode() {
+      diameterMode = !diameterMode;
+      const btn = document.getElementById('toggleDiameterBtn');
+
+      if (diameterMode) {
+        btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-700');
+        angleA = Math.PI;
+        angleB = 0;
+      } else {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-700');
+      }
+      drawGeomScene();
+    }
+
+    function resetCanvasPoints() {
+      angleA = 3.8;
+      angleB = 5.6;
+      angleC1 = 1.57;
+      angleC2 = 1.0;
+      diameterMode = false;
+      document.getElementById('toggleDiameterBtn').classList.remove('bg-indigo-600', 'text-white', 'border-indigo-700');
+      drawGeomScene();
+    }
+
+    /* ==========================================================
+       FITUR TAHAP 5: KOTAK PERBANDINGAN DAN SIMPULAN
+    ========================================================== */
+    function renderComparisonCards() {
+      const container = document.getElementById('comparisonCardsContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      comparisonTrials.forEach((trial, idx) => {
+        const card = document.createElement('div');
+        const isFilled = trial.filled;
+
+        card.className = `p-4 rounded-2xl border transition-all ${
+          isFilled 
+            ? 'bg-white border-brand-200 shadow-sm ring-1 ring-brand-500/10' 
+            : 'bg-slate-50 border-dashed border-slate-300 opacity-90'
+        }`;
+
+        if (!isFilled) {
+          card.innerHTML = `
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+              <span class="text-xs font-bold text-slate-500">Percobaan #${idx + 1}</span>
+              <span class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-semibold">Kosong</span>
+            </div>
+            <div class="py-6 text-center text-slate-400 space-y-2">
+              <i class="fa-solid fa-circle-dashed text-2xl text-slate-300"></i>
+              <p class="text-xs">Atur kanvas, lalu simpan ke slot #${idx + 1}.</p>
+            </div>
+            <button type="button" onclick="recordToSlot(${idx})" 
+              class="w-full py-2 bg-slate-200 hover:bg-brand-600 hover:text-white text-slate-700 text-xs font-bold rounded-xl transition">
+              <i class="fa-solid fa-plus mr-1"></i> Rekam Posisi Ini
+            </button>
+          `;
+        } else {
+          card.innerHTML = `
+            <div class="flex items-center justify-between pb-2 border-b border-indigo-100">
+              <span class="text-xs font-bold text-brand-700">Percobaan #${idx + 1}</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold flex items-center gap-1">
+                <i class="fa-solid fa-check"></i> Terekam
+              </span>
+            </div>
+
+            <div class="space-y-2 py-2 text-xs">
+              <div class="flex justify-between items-center bg-indigo-50/70 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">Sudut Pusat ($\\angle AOB$):</span>
+                <span class="font-bold text-brand-700 text-sm">${trial.centerAngle.toFixed(1)}°</span>
+              </div>
+
+              <div class="flex justify-between items-center bg-emerald-50/70 p-2 rounded-lg">
+                <span class="text-slate-600 font-medium">Sudut Keliling ($\\angle ACB$):</span>
+                <span class="font-bold text-emerald-700 text-sm">${trial.inscribedAngle.toFixed(1)}°</span>
+              </div>
+
+              <div class="flex justify-between items-center bg-slate-100 p-2 rounded-lg font-mono">
+                <span class="text-slate-600 font-sans font-medium text-[11px]">Rasio (Pusat / Keliling):</span>
+                <span class="font-bold text-slate-900">${trial.ratio.toFixed(2)}×</span>
+              </div>
+
+              <div class="p-2 bg-amber-50 rounded-lg border border-amber-200/80 text-[11px] text-amber-900 font-semibold text-center">
+                ${trial.centerAngle.toFixed(1)}° ≈ 2 × ${trial.inscribedAngle.toFixed(1)}°
+              </div>
+            </div>
+
+            <button type="button" onclick="recordToSlot(${idx})" 
+              class="w-full mt-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold rounded-lg transition">
+              <i class="fa-solid fa-arrows-rotate mr-1"></i> Timpa Data
+            </button>
+          `;
+        }
+
+        container.appendChild(card);
+      });
+
+      triggerKaTeX(container);
+    }
+
+    function recordCurrentTrial() {
+      const emptyIndex = comparisonTrials.findIndex(t => !t.filled);
+      const targetIndex = emptyIndex !== -1 ? emptyIndex : 0;
+      recordToSlot(targetIndex);
+    }
+
+    function recordToSlot(slotIndex) {
+      comparisonTrials[slotIndex] = {
+        id: slotIndex + 1,
+        label: `Uji Coba ${slotIndex + 1}`,
+        centerAngle: currentLiveDeg.central,
+        inscribedAngle: currentLiveDeg.inscribed,
+        ratio: currentLiveDeg.ratio,
+        filled: true
+      };
+      renderComparisonCards();
+    }
+
+    function fillPresetComparisons() {
+      comparisonTrials = [
+        { id: 1, label: "Uji Coba 1 (Sudut Lancip)", centerAngle: 76.0, inscribedAngle: 38.0, ratio: 2.0, filled: true },
+        { id: 2, label: "Uji Coba 2 (Sudut Tumpul)", centerAngle: 130.0, inscribedAngle: 65.0, ratio: 2.0, filled: true },
+        { id: 3, label: "Uji Coba 3 (Sudut Lurus Thales)", centerAngle: 180.0, inscribedAngle: 90.0, ratio: 2.0, filled: true }
+      ];
+      renderComparisonCards();
+    }
+
+    function resetComparisonTrials() {
+      comparisonTrials = [
+        { id: 1, label: "Uji Coba 1", centerAngle: null, inscribedAngle: null, ratio: null, filled: false },
+        { id: 2, label: "Uji Coba 2", centerAngle: null, inscribedAngle: null, ratio: null, filled: false },
+        { id: 3, label: "Uji Coba 3", centerAngle: null, inscribedAngle: null, ratio: null, filled: false }
+      ];
+      renderComparisonCards();
+    }
+
+    function validateGroupConclusion() {
+      const q1 = document.getElementById('conclusionQ1').value;
+      const q2 = document.getElementById('conclusionQ2').value;
+      const q3 = document.getElementById('conclusionQ3').value;
+      const q4 = document.getElementById('conclusionQ4').value;
+      const freeText = document.getElementById('conclusionFreeText').value.trim();
+
+      const alertBox = document.getElementById('conclusionAlertBox');
+      const badge = document.getElementById('conclusionStatusBadge');
+      const feedback = document.getElementById('conclusionFeedbackText');
+
+      if (!q1 || !q2 || !q3 || !q4) {
+        alertBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-rose-50 border border-rose-200 text-rose-800";
+        alertBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation"></i> Opsi Belum Lengkap</div>
+          <p class="mt-0.5">Harap jawab semua 4 pertanyaan pilihan ganda terbimbing di atas sebelum mengunci simpulan.</p>
+        `;
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      if (!freeText) {
+        alertBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-amber-50 border border-amber-200 text-amber-800";
+        alertBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Catatan Kalimat Belum Diisi</div>
+          <p class="mt-0.5">Tuliskan minimal 1 kalimat ringkasan temuan kelompok pada kotak teks di atas.</p>
+        `;
+        alertBox.classList.remove('hidden');
+        return;
+      }
+
+      // Validasi Jawaban Kunci
+      const isQ1Correct = q1 === 'double';
+      const isQ2Correct = q2 === 'half';
+      const isQ3Correct = q3 === 'equal';
+      const isQ4Correct = q4 === '90';
+
+      if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+        studentConclusionState = { q1, q2, q3, q4, freeText, isValidated: true };
+
+        badge.className = "px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs font-bold flex items-center gap-1.5";
+        badge.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> Simpulan Valid & Terkunci`;
+
+        feedback.className = "text-xs font-bold text-emerald-600 flex items-center gap-1";
+        feedback.innerHTML = `<i class="fa-solid fa-check-double"></i> Seluruh simpulan telah terverifikasi secara matematis!`;
+
+        alertBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-emerald-50 border border-emerald-300 text-emerald-800";
+        alertBox.innerHTML = `
+          <div class="font-extrabold text-emerald-950 text-sm flex items-center gap-2">
+            <i class="fa-solid fa-award text-amber-500 text-lg"></i>
+            SIMPULAN TEOREMA KELOMPOK TERVERIFIKASI SEMPURNA!
+          </div>
+          <p class="mt-1">
+            Kerja bagus! Berdasarkan kotak perbandingan, kalian membuktikan secara konsisten bahwa:
+          </p>
+          <ul class="list-disc pl-5 mt-1 text-xs space-y-0.5">
+            <li>$\\angle AOB = 2 \\times \\angle ACB$ (Sudut pusat dua kali sudut keliling).</li>
+            <li>$\\angle ACB = \\frac{1}{2} \\angle AOB$ (Sudut keliling setengah sudut pusat).</li>
+            <li>Semua sudut keliling menghadap busur sama adalah kongruen ($\\angle AC_1B = \\angle AC_2B$).</li>
+            <li>Sudut keliling menghadap diameter bernilai tepat $90^\\circ$ (Teorema Thales: $\\angle APB = 90^\\circ$).</li>
+          </ul>
+        `;
+        alertBox.classList.remove('hidden');
+        triggerConfetti();
+      } else {
+        alertBox.className = "p-4 rounded-xl text-xs sm:text-sm bg-rose-50 border border-rose-300 text-rose-800";
+        alertBox.innerHTML = `
+          <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Masih Ada Simpulan yang Kurang Tepat</div>
+          <p class="mt-1">Periksa kembali opsi jawaban Anda. Ingat: sudut pusat adalah sudut besar di titik pusat lingkaran, sedangkan sudut keliling berada di busur perairan.</p>
+        `;
+        alertBox.classList.remove('hidden');
+      }
+
+      triggerKaTeX(alertBox);
+    }
+
+    /* ==========================================================
+       LANGKAH 6: EVALUASI KUIS HOTS
+    ========================================================== */
+    const HOTS_QUESTIONS = [
+      {
+        id: 1,
+        title: "KASUS 1: Radar Pertahanan Selat Malaka",
+        scenario: "Sebuah kapal pengintai mendeteksi sinyal distres dua suar di koordinat A dan B. Dari posisi kapal (titik C) di keliling zona deteksi, teropong optik membaca sudut pandang $\\angle ACB = 38^\\circ$. Operator menara radar pusat (titik O) memutar antena pemancar sapuan untuk melacak busur AB yang sama. Berapakah besar sudut putaran sapuan radar $\\angle AOB$ yang harus disetel operator?",
+        options: [
+          { text: "19° karena sudut pusat setengah dari sudut keliling", score: 0 },
+          { text: "76° karena sudut pusat dua kali lipat sudut keliling yang menghadap busur yang sama", score: 25 },
+          { text: "142° karena keduanya saling berpelurus (suplemen)", score: 0 },
+          { text: "38° karena semua sudut menghadap busur yang sama bernilai identik", score: 0 }
+        ],
+        explanation: "Sesuai Teorema Sudut Pusat dan Sudut Keliling: $\\angle AOB = 2 \\times \\angle ACB = 2 \\times 38^\\circ = 76^\\circ$."
+      },
+      {
+        id: 2,
+        title: "KASUS 2: Arsitektur Akustik Amfiteater Melingkar",
+        scenario: "Dua penonton duduk di tribun keliling amfiteater pada posisi berbeda (titik C₁ dan C₂). Keduanya sama-sama memandang bentangan panggung pertunjukan utama yang terletak pada busur AB. Jika penonton di C₁ memiliki sudut penglihatan panggung $\\angle AC_1B = 44^\\circ$, berapakah sudut pandang yang dinikmati penonton di posisi C₂?",
+        options: [
+          { text: "Lebih kecil karena posisinya bergeser menyamping di tribun", score: 0 },
+          { text: "88° karena berpindah tempat melipatgandakan sudut akustik", score: 0 },
+          { text: "Tepat 44° karena sudut-sudut keliling yang menghadap busur yang sama selalu sama besar", score: 25 },
+          { text: "Tidak dapat ditentukan tanpa mengetahui koordinat jari-jari tribun", score: 0 }
+        ],
+        explanation: "Sifat Turunan 1: Semua sudut keliling yang menghadap busur lingkaran yang sama besarnya adalah identik ($\\angle AC_1B = \\angle AC_2B = 44^\\circ$)."
+      },
+      {
+        id: 3,
+        title: "KASUS 3: Navigasi Kapal Melintasi Garis Diameter (Teorema Thales)",
+        scenario: "Sebuah lintasan kabel bawah laut dibentangkan lurus melintasi titik pusat samudra, membentuk garis diameter XY. Tim teknisi kapal selam di titik Z (berada di batas lingkaran perairan) hendak memasang sensor jangkar ke kedua ujung kabel X dan Y. Berapakah besar sudut penglihatan $\\angle XZY$ teknisi terhadap kedua ujung kabel tersebut?",
+        options: [
+          { text: "Pasti tepat 90° (siku-siku) karena menghadap diameter lingkaran bernilai 180°", score: 25 },
+          { text: "60° karena membentuk pola segitiga sama sisi", score: 0 },
+          { text: "180° karena kabelnya berbentuk garis lurus datar", score: 0 },
+          { text: "Bervariasi antara 45° sampai 135° bergantung kecepatan kapal selam", score: 0 }
+        ],
+        explanation: "Teorema Thales: Sudut keliling yang menghadap diameter lingkaran selalu tepat $90^\\circ$ (siku-siku): $\\angle XZY = \\frac{1}{2} \\times 180^\\circ = 90^\\circ$."
+      },
+      {
+        id: 4,
+        title: "KASUS 4: Geometri Pemancar Satelit & Sudut Refleks",
+        scenario: "Dalam konfigurasi orbit, busur mayor satelit AB menghasilkan sudut pusat refleks $\\angle AOB = 260^\\circ$. Sebuah stasiun relai di permukaan bumi (titik keliling P) menangkap sinyal dari busur mayor AB yang sama tersebut. Berapakah besar sudut penerimaan $\\angle APB$ di stasiun relai?",
+        options: [
+          { text: "100°", score: 0 },
+          { text: "130° karena relai menghadap busur yang sama dengan sudut refleks", score: 25 },
+          { text: "50°", score: 0 },
+          { text: "260°", score: 0 }
+        ],
+        explanation: "Hubungan $\\angle APB = \\frac{1}{2} \\times \\angle AOB = \\frac{1}{2} \\times 260^\\circ = 130^\\circ$ tetap konsisten berlaku."
+      }
+    ];
+
+    let userAnswers = {};
+
+    function renderQuizQuestions() {
+      const container = document.getElementById('quizContainer');
+      container.innerHTML = '';
+
+      HOTS_QUESTIONS.forEach((q) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = "p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4";
+
+        let optionsHtml = q.options.map((opt, oIndex) => `
+          <label class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:bg-indigo-50/50 cursor-pointer transition text-xs sm:text-sm">
+            <input type="radio" name="question_${q.id}" value="${oIndex}" onchange="selectAnswer(${q.id}, ${oIndex})"
+              class="mt-1 text-brand-600 focus:ring-brand-500" />
+            <span class="text-slate-700 font-medium">${opt.text}</span>
+          </label>
+        `).join('');
+
+        qDiv.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-xs">${q.id}</span>
+            <h4 class="font-bold text-slate-800 text-sm sm:text-base">${q.title}</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${q.scenario}</p>
+          <div class="space-y-2 pt-1">
+            ${optionsHtml}
+          </div>
+          <div id="feedback_q_${q.id}" class="hidden p-3 rounded-xl text-xs"></div>
+        `;
+        container.appendChild(qDiv);
+      });
+
+      triggerKaTeX(container);
+    }
+
+    function selectAnswer(questionId, optionIndex) {
+      userAnswers[questionId] = optionIndex;
+      calculateQuizScore();
+    }
+
+    function calculateQuizScore() {
+      let total = 0;
+      HOTS_QUESTIONS.forEach(q => {
+        if (userAnswers[q.id] !== undefined) {
+          total += q.options[userAnswers[q.id]].score;
+        }
+      });
+      document.getElementById('quizScoreDisplay').innerText = `${total} / 100`;
+      return total;
+    }
+
+    function finishEvaluation() {
+      const finalScore = calculateQuizScore();
+
+      HOTS_QUESTIONS.forEach(q => {
+        const fbBox = document.getElementById(`feedback_q_${q.id}`);
+        const userChoice = userAnswers[q.id];
+        fbBox.classList.remove('hidden');
+
+        if (userChoice !== undefined && q.options[userChoice].score > 0) {
+          fbBox.className = "p-3 rounded-xl text-xs bg-emerald-50 border border-emerald-200 text-emerald-800";
+          fbBox.innerHTML = `<strong>Jawaban Tepat (+25 Poin)</strong><br>${q.explanation}`;
+        } else {
+          fbBox.className = "p-3 rounded-xl text-xs bg-rose-50 border border-rose-200 text-rose-800";
+          fbBox.innerHTML = `<strong>Kurang Tepat.</strong><br>${q.explanation}`;
+        }
+      });
+
+      triggerKaTeX(document.getElementById('quizContainer'));
+      document.getElementById('summaryBannerBox').classList.remove('hidden');
+
+      preparePrintablePdfDocument(finalScore);
+      triggerConfetti();
+    }
+
+    /* ==========================================================
+       KOMPILASI DOKUMEN CETAK PDF LENGKAP
+    ========================================================== */
+    function preparePrintablePdfDocument(score) {
+      document.getElementById('pdfPrintDate').innerText = new Date().toLocaleDateString('id-ID', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+      document.getElementById('pdfGroupName').innerText = groupData.name || "Kelompok Belajar";
+      document.getElementById('pdfFinalScoreBadge').innerText = `${score} / 100`;
+      document.getElementById('pdfSignatureLeader').innerText = `( ${groupData.members[0]?.name || "Ketua Kelompok"} )`;
+
+      // 1. Tabel Anggota
+      const membersTbody = document.getElementById('pdfMembersTableBody');
+      membersTbody.innerHTML = groupData.members.map((m, idx) => `
+        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+          <td class="border border-slate-400 px-2 py-1 text-center">${idx + 1}</td>
+          <td class="border border-slate-400 px-3 py-1 font-semibold">${m.name}</td>
+          <td class="border border-slate-400 px-3 py-1">${m.role}</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold text-emerald-700">Aktif</td>
+        </tr>
+      `).join('');
+
+      // 2. Foto Asli Lukisan Siswa
+      const capturedPreview = document.getElementById('capturedImagePreview');
+      const pdfImg = document.getElementById('pdfCapturedImage');
+      const pdfImgNote = document.getElementById('pdfImageNote');
+
+      if (capturedPreview && capturedPreview.src && !capturedPreview.classList.contains('hidden')) {
+        pdfImg.src = capturedPreview.src;
+        pdfImgNote.innerText = "Dokumentasi Foto Asli Lukisan Siswa Terverifikasi.";
+      } else {
+        pdfImg.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'><rect width='300' height='200' fill='%23f1f5f9'/><text x='150' y='100' font-family='sans-serif' font-size='11' fill='%2364748b' text-anchor='middle'>Lampiran Gambar Kertas Kerja Fisik</text></svg>";
+        pdfImgNote.innerText = "Foto fisik belum diambil saat sesi verifikasi.";
+      }
+
+      // 3. Tabel Pengukuran Fisik (Escaped KaTeX)
+      const measTbody = document.getElementById('pdfMeasurementTableBody');
+      const cAngle = physicalVerificationData.centerAngle || 100;
+      const iAngle = physicalVerificationData.inscribedAngle || 50;
+      const iAngle2 = physicalVerificationData.inscribedAngle2 || iAngle;
+      const idealInscribed = (cAngle / 2).toFixed(1);
+      const delta = (physicalVerificationData.delta !== null ? physicalVerificationData.delta.toFixed(1) : "0.0");
+
+      measTbody.innerHTML = `
+        <tr class="bg-white">
+          <td class="border border-slate-400 px-2 py-1 font-semibold">Sudut Pusat ($\\angle AOB$)</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold">${cAngle}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center">${cAngle}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center">0.0°</td>
+        </tr>
+        <tr class="bg-slate-50">
+          <td class="border border-slate-400 px-2 py-1 font-semibold">Sudut Keliling ($\\angle ACB$)</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold">${iAngle}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center">${idealInscribed}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold ${parseFloat(delta) <= 4 ? 'text-emerald-700' : 'text-rose-600'}">${delta}°</td>
+        </tr>
+        <tr class="bg-white">
+          <td class="border border-slate-400 px-2 py-1 font-semibold">Sudut Keliling Ke-2 ($\\angle ADB$)</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold">${iAngle2}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center">${idealInscribed}°</td>
+          <td class="border border-slate-400 px-2 py-1 text-center font-bold text-emerald-700">${Math.abs(iAngle2 - idealInscribed).toFixed(1)}°</td>
+        </tr>
+      `;
+
+      // 4. Snapshot Kanvas Digital
+      if (canvas) {
+        const canvasDataUrl = canvas.toDataURL('image/png');
+        document.getElementById('pdfCanvasSnapshot').src = canvasDataUrl;
+      }
+
+      // 5. Tabel Hasil Perbandingan di PDF (Escaped KaTeX)
+      const compTbody = document.getElementById('pdfComparisonTableBody');
+      compTbody.innerHTML = comparisonTrials.map((t, idx) => {
+        const cVal = t.filled ? `${t.centerAngle.toFixed(1)}°` : '—';
+        const iVal = t.filled ? `${t.inscribedAngle.toFixed(1)}°` : '—';
+        const rVal = t.filled ? `${t.ratio.toFixed(2)}×` : '—';
+        const notes = t.filled ? `Sudut Pusat = 2 × (${iVal})` : 'Belum diuji';
+        return `
+          <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+            <td class="border border-slate-400 px-2 py-1 text-center font-bold">#${idx + 1}</td>
+            <td class="border border-slate-400 px-2 py-1 text-center font-semibold">${cVal}</td>
+            <td class="border border-slate-400 px-2 py-1 text-center font-semibold text-emerald-800">${iVal}</td>
+            <td class="border border-slate-400 px-2 py-1 text-center font-mono font-bold">${rVal}</td>
+            <td class="border border-slate-400 px-3 py-1 font-semibold text-indigo-900">${notes}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // 6. Simpulan Siswa di PDF
+      const pdfConclusionText = document.getElementById('pdfStudentConclusionText');
+      if (studentConclusionState.freeText) {
+        pdfConclusionText.innerText = `"${studentConclusionState.freeText}" (Status: Telah Divalidasi)`;
+      } else {
+        pdfConclusionText.innerText = `"Siswa menyimpulkan bahwa besar sudut pusat selalu dua kali lipat sudut keliling yang menghadap busur yang sama."`;
+      }
+
+      // 7. Tabel Kuis HOTS
+      const quizTbody = document.getElementById('pdfQuizTableBody');
+      quizTbody.innerHTML = HOTS_QUESTIONS.map((q, idx) => {
+        const uChoice = userAnswers[q.id];
+        const isCorrect = uChoice !== undefined && q.options[uChoice].score > 0;
+        const answerText = uChoice !== undefined ? q.options[uChoice].text.substring(0, 48) + '...' : 'Belum dijawab';
+        return `
+          <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}">
+            <td class="border border-slate-400 px-2 py-1 text-center font-bold">${q.id}</td>
+            <td class="border border-slate-400 px-3 py-1 font-semibold">${q.title}</td>
+            <td class="border border-slate-400 px-3 py-1">${answerText}</td>
+            <td class="border border-slate-400 px-2 py-1 text-center font-bold ${isCorrect ? 'text-emerald-700' : 'text-rose-600'}">
+              ${isCorrect ? 'BENAR' : 'SALAH'}
+            </td>
+            <td class="border border-slate-400 px-2 py-1 text-center font-bold">${isCorrect ? 25 : 0}</td>
+          </tr>
+        `;
+      }).join('');
+
+      triggerKaTeX(document.getElementById('printablePdfReport'));
+    }
+
+    function triggerPrintPdf() {
+      window.print();
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 110,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+    }
+
+    /* ==========================================================
+       INITIALIZATION
+    ========================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderMembersList();
+      renderQuizQuestions();
+      renderComparisonCards();
+      setTimeout(() => triggerKaTeX(document.body), 150);
+    });
+  </script>
+</body>
+</html>
