@@ -1,2 +1,0 @@
-# LKPD-matematika
-LKPD matematika
